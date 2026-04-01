@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PNC Quest Progress Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #ffd966;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .card h2 {
+            margin-top: 0;
+            color: #ffd966;
+            border-bottom: 2px solid #0f3460;
+            padding-bottom: 10px;
+        }
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .input-group label {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .input-group input {
+            background: #1a1a2e;
+            border: 1px solid #ffd966;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 1em;
+            width: 150px;
+        }
+        .input-group button {
+            background: #ffd966;
+            color: #1a1a2e;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .input-group button:hover {
+            transform: scale(1.02);
+            background: #ffed4a;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85em;
+        }
+        th, td {
+            border: 1px solid #0f3460;
+            padding: 10px 8px;
+            text-align: right;
+        }
+        th {
+            background: #0f3460;
+            color: #ffd966;
+            font-weight: bold;
+            text-align: center;
+        }
+        td:first-child, th:first-child {
+            text-align: left;
+            font-weight: 500;
+        }
+        .highlight {
+            background: #2a3f5e;
+        }
+        .total-row {
+            background: #0f3460;
+            font-weight: bold;
+        }
+        .total-row td {
+            border-top: 2px solid #ffd966;
+        }
+        .diamond-cost {
+            color: #ffaa66;
+            font-weight: bold;
+        }
+        .units-need {
+            color: #66ffaa;
+            font-weight: bold;
+        }
+        .note {
+            font-size: 0.8em;
+            color: #aaa;
+            margin-top: 10px;
+            padding: 10px;
+            background: #0f3460;
+            border-radius: 6px;
+        }
+        @media (max-width: 768px) {
+            table {
+                font-size: 0.7em;
+            }
+            th, td {
+                padding: 6px 4px;
+            }
+            .input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .input-group input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🔮 PNC Quest Progress Calculator</h1>
+    <div class="subtitle">Enter your current progress to see how many items you still need</div>
+
+    <!-- Hero Upgrade Section -->
+    <div class="card">
+        <h2>⚔️ 1. Hero Upgrade (Target: 1,250,000 points)</h2>
+        <div class="input-group">
+            <label>Your current progress:</label>
+            <input type="number" id="heroProgress" value="1" step="1">
+            <button onclick="updateHero()">Calculate</button>
+        </div>
+        <div id="heroTable"></div>
+    </div>
+
+    <!-- Mixed Speedups Section -->
+    <div class="card">
+        <h2>⏱️ 2. Mixed Speedups (non-heal) - Target: 750,000 points</h2>
+        <div class="input-group">
+            <label>Your current speedup minutes:</label>
+            <input type="number" id="speedupProgress" value="682500" step="1000">
+            <button onclick="updateSpeedup()">Calculate</button>
+        </div>
+        <div id="speedupResult"></div>
+    </div>
+
+    <!-- Gear Section -->
+    <div class="card">
+        <h2>⚙️ 3. Gear / Red (Target: 1,000,000 points)</h2>
+        <div class="input-group">
+            <label>Your current progress:</label>
+            <input type="number" id="gearProgress" value="25300" step="1000">
+            <button onclick="updateGear()">Calculate</button>
+        </div>
+        <div id="gearResult"></div>
+    </div>
+
+    <!-- Totem Section -->
+    <div class="card">
+        <h2>🪄 4. Totem / Blue (Target: 1,000,000 points)</h2>
+        <div class="input-group">
+            <label>Your current progress:</label>
+            <input type="number" id="totemProgress" value="600000" step="10000">
+            <button onclick="updateTotem()">Calculate</button>
+        </div>
+        <div id="totemResult"></div>
+    </div>
+
+    <!-- Dragon Stones Section -->
+    <div class="card">
+        <h2>💎 5. Dragon Stones / Glory (Target: 1,000,000 points)</h2>
+        <div class="input-group">
+            <label>Your current progress:</label>
+            <input type="number" id="dragonProgress" value="928100" step="10000">
+            <button onclick="updateDragon()">Calculate</button>
+        </div>
+        <div id="dragonResult"></div>
+    </div>
+
+    <!-- Ancient Prologue Section -->
+    <div class="card">
+        <h2>📜 Ancient Prologue Arm Race (Target: 900,000 points)</h2>
+        <div class="input-group">
+            <label>Your current progress:</label>
+            <input type="number" id="ancientProgress" value="0" step="10000">
+            <button onclick="updateAncient()">Calculate</button>
+        </div>
+        <div id="ancientResult"></div>
+    </div>
+
+    <div class="note">
+        💡 <strong>How to use:</strong> Enter your current points/"you reached" value for each section and click Calculate.<br>
+        The table shows different items you can use, how many you need, and diamond costs where applicable.<br>
+        📊 Based on the original spreadsheet formulas.
+    </div>
+</div>
+
+<script>
+    // Helper function to format numbers
+    function formatNumber(num) {
+        return Math.ceil(num).toLocaleString();
+    }
+
+    // Hero Upgrade Table
+    function updateHero() {
+        let progress = parseFloat(document.getElementById('heroProgress').value) || 0;
+        let target = 1250000;
+        let remaining = Math.max(0, target - progress);
+        
+        const items = [
+            { name: "get *5 shard", points: 20000, shards: 63 },
+            { name: "get *4 shard", points: 8000, shards: 156 },
+            { name: "get *3 shard", points: 2000, shards: 625 },
+            { name: "get *2 shard", points: 500, shards: 2500 },
+            { name: "bond gift t1", points: 75, shards: 16667 },
+            { name: "bond gift t2", points: 375, shards: 3333 },
+            { name: "bond gift t3", points: 937, shards: 1334 },
+            { name: "bond gift t5", points: 18750, shards: 67 }
+        ];
+        
+        let html = `<table>
+            <thead>
+                <tr><th>Item</th><th>Points per item</th><th>Items needed to complete</th><th>Shards/Units needed</th></tr>
+            </thead>
+            <tbody>`;
+        
+        items.forEach(item => {
+            let itemsNeeded = Math.ceil(remaining / item.points);
+            let shardsNeeded = itemsNeeded * item.shards;
+            html += `<tr>
+                <td>${item.name}</td>
+                <td>${formatNumber(item.points)}</td>
+                <td class="units-need">${formatNumber(itemsNeeded)}</td>
+                <td>${formatNumber(shardsNeeded)}</td>
+            </tr>`;
+        });
+        
+        html += `<tr class="total-row"><td colspan="2"><strong>Remaining points:</strong></td><td colspan="2"><strong>${formatNumber(remaining)}</strong></td></tr>`;
+        html += `</tbody></table>`;
+        document.getElementById('heroTable').innerHTML = html;
+    }
+
+    // Speedup Section
+    function updateSpeedup() {
+        let progress = parseFloat(document.getElementById('speedupProgress').value) || 0;
+        let target = 750000;
+        let remaining = Math.max(0, target - progress);
+        
+        let pointsPerMin = 15;
+        let minsNeeded = Math.ceil(remaining / pointsPerMin);
+        let hrsNeeded = minsNeeded / 60;
+        let diamondRate = 116.22;
+        let diamondsToSpend = Math.ceil(remaining / pointsPerMin * diamondRate);
+        
+        let html = `<table>
+            <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+            <tbody>
+                <tr><td>Points remaining</td><td class="units-need">${formatNumber(remaining)}</td></tr>
+                <tr><td>Minutes of speedups needed</td><td class="units-need">${formatNumber(minsNeeded)} mins</td></tr>
+                <tr><td>Hours of speedups needed</td><td>${hrsNeeded.toFixed(2)} hrs</td></tr>
+                <tr><td>Diamonds to spend (at ${diamondRate} diamonds/hr)</td><td class="diamond-cost">💎 ${formatNumber(diamondsToSpend)}</td></tr>
+            </tbody>
+        </table>`;
+        document.getElementById('speedupResult').innerHTML = html;
+    }
+
+    // Gear Section
+    function updateGear() {
+        let progress = parseFloat(document.getElementById('gearProgress').value) || 0;
+        let target = 1000000;
+        let remaining = Math.max(0, target - progress);
+        let diamondPerItem = 10;
+        let itemsNeeded = Math.ceil(remaining / 100);
+        let diamondsCost = itemsNeeded * diamondPerItem;
+        
+        let html = `<table>
+            <thead><tr><th>Item Type</th><th>Points per item</th><th>Items needed</th><th>Diamond Cost</th></tr></thead>
+            <tbody>
+                <tr><td>*1 essence</td><td>100</td><td class="units-need">${formatNumber(itemsNeeded)}</td><td class="diamond-cost">💎 ${formatNumber(diamondsCost)}</td></tr>
+                <tr><td>Energy Spinel</td><td>1,000</td><td>${formatNumber(Math.ceil(remaining/1000))}</td><td>-</td></tr>
+                <tr><td>Energy Crystal</td><td>5,000</td><td>${formatNumber(Math.ceil(remaining/5000))}</td><td>-</td></tr>
+                <tr><td>*3 Combat gear</td><td>5,000</td><td>${formatNumber(Math.ceil(remaining/5000))}</td><td>-</td></tr>
+                <tr><td>*4 Combat gear</td><td>50,000</td><td>${formatNumber(Math.ceil(remaining/50000))}</td><td>-</td></tr>
+                <tr><td>*5 Combat gear</td><td>200,000</td><td>${formatNumber(Math.ceil(remaining/200000))}</td><td>-</td></tr>
+                <tr><td>Arcane Cores</td><td>50,000</td><td>${formatNumber(Math.ceil(remaining/50000))}</td><td>-</td></tr>
+            </tbody>
+        </table>`;
+        document.getElementById('gearResult').innerHTML = html;
+    }
+
+    // Totem Section
+    function updateTotem() {
+        let progress = parseFloat(document.getElementById('totemProgress').value) || 0;
+        let target = 1000000;
+        let remaining = Math.max(0, target - progress);
+        let diamondPerItem = 10;
+        let essenceNeeded = Math.ceil(remaining / 100);
+        let diamondsCost = essenceNeeded * diamondPerItem;
+        
+        let items = [
+            { name: "*1 essence", points: 100, multiplier: 1 },
+            { name: "Energy Spinel", points: 1000, multiplier: 1 },
+            { name: "Energy Crystal", points: 5000, multiplier: 5 },
+            { name: "*3 Totem", points: 5000, multiplier: 5 },
+            { name: "*4 Totem", points: 50000, multiplier: 50 },
+            { name: "*5 Totem", points: 200000, multiplier: 200 },
+            { name: "Arcane Cores", points: 50000, multiplier: 50 }
+        ];
+        
+        let html = `<table>
+            <thead><tr><th>Item</th><th>Points per item</th><th>Items needed</th><th>Units/Diamonds</th></tr></thead>
+            <tbody>`;
+        
+        items.forEach(item => {
+            let itemsNeeded = Math.ceil(remaining / item.points);
+            let cost = item.multiplier ? itemsNeeded * item.multiplier : itemsNeeded * 10;
+            html += `<tr>
+                <td>${item.name}</td>
+                <td>${formatNumber(item.points)}</td>
+                <td class="units-need">${formatNumber(itemsNeeded)}</td>
+                <td>${item.name === "*1 essence" ? `💎 ${formatNumber(itemsNeeded * 10)}` : formatNumber(itemsNeeded)}</td>
+            </tr>`;
+        });
+        
+        html += `<tr><td colspan="4"><strong>Essence method (100 pts each):</strong> ${formatNumber(essenceNeeded)} items, 💎 ${formatNumber(diamondsCost)}</td></tr>`;
+        html += `</tbody></table>`;
+        document.getElementById('totemResult').innerHTML = html;
+    }
+
+    // Dragon Stones Section
+    function updateDragon() {
+        let progress = parseFloat(document.getElementById('dragonProgress').value) || 0;
+        let target = 1000000;
+        let remaining = Math.max(0, target - progress);
+        
+        const items = [
+            { name: "green (dragon stone)", points: 20000 },
+            { name: "blue", points: 100000 },
+            { name: "purple", points: 400000 },
+            { name: "orange", points: 1000000 },
+            { name: "red", points: 2000000 },
+            { name: "green shard", points: 200 },
+            { name: "blue shard", points: 1000 },
+            { name: "purple shard", points: 4000 },
+            { name: "orange shard", points: 10000 },
+            { name: "red shard", points: 20000 },
+            { name: "holywater", points: 100 },
+            { name: "Mark of glory", points: 600 },
+            { name: "Holy Emblem", points: 3000 }
+        ];
+        
+        let html = `<table>
+            <thead><tr><th>Item</th><th>Points each</th><th>Items needed</th></tr></thead>
+            <tbody>`;
+        
+        items.forEach(item => {
+            let itemsNeeded = Math.ceil(remaining / item.points);
+            html += `<tr>
+                <td>${item.name}</td>
+                <td>${formatNumber(item.points)}</td>
+                <td class="units-need">${formatNumber(itemsNeeded)}</td>
+            </tr>`;
+        });
+        
+        html += `<tr class="total-row"><td colspan="2"><strong>Remaining points:</strong></td><td><strong>${formatNumber(remaining)}</strong></td></tr>`;
+        html += `</tbody></table>`;
+        document.getElementById('dragonResult').innerHTML = html;
+    }
+
+    // Ancient Prologue Section
+    function updateAncient() {
+        let progress = parseFloat(document.getElementById('ancientProgress').value) || 0;
+        let target = 900000;
+        let remaining = Math.max(0, target - progress);
+        let essenceNeeded = Math.ceil(remaining / 100);
+        let diamondsCost = essenceNeeded * 10;
+        
+        let html = `<table>
+            <thead><tr><th>Item</th><th>Points per item</th><th>Items needed</th><th>Cost</th></tr></thead>
+            <tbody>
+                <tr><td>*1 essence</td><td>100</td><td class="units-need">${formatNumber(essenceNeeded)}</td><td class="diamond-cost">💎 ${formatNumber(diamondsCost)}</td></tr>
+                <tr><td>Energy Spinel</td><td>1,000</td><td>${formatNumber(Math.ceil(remaining/1000))}</td><td>-</td></tr>
+                <tr><td>Energy Crystal</td><td>5,000</td><td>${formatNumber(Math.ceil(remaining/5000))}</td><td>-</td></tr>
+            </tbody>
+        </table>`;
+        document.getElementById('ancientResult').innerHTML = html;
+    }
+
+    // Initialize all calculators
+    window.onload = () => {
+        updateHero();
+        updateSpeedup();
+        updateGear();
+        updateTotem();
+        updateDragon();
+        updateAncient();
+    };
+</script>
+</body>
+</html>
